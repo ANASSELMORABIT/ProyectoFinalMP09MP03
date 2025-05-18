@@ -7,8 +7,19 @@
 **Autores:** Rafael Valerio y Anass El Morabit  
 **Módulos:** M9 y M3  
 **Curso:** Segundo de DAW  
-**Url:** http://raffaele26etp-001-site1.ntempurl.com/
+
 ---
+***Link Hosting WebApp**
+> ** http://raffaele26etp-001-site1.ntempurl.com/ **
+
+
+
+
+***Prueba Wave**
+> **Marc, la prueba del wave no me muestra los estilos aplicados y no deja avanzar del inicio de sesion esto solo sucede en el validator del wave.**
+>
+> ![prueba wave](https://github.com/RVDveloper/M9M3Final/blob/main/PRJ-FINAL%20MP09-MP03/SCR-20250518-mjoy.png)
+
 
 ## Justificación y motivación del proyecto
 
