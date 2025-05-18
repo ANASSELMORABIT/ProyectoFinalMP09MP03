@@ -1,0 +1,302 @@
+@model PRJ_FINAL_MP09_MP03.Models.SongDetaille.Song
+
+@{
+    ViewData["Title"] = Model.full_title;
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@Model.full_title</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <!-- Estilo personalizado -->
+    <link href="~/css/dashboard.css" rel="stylesheet" />
+
+    <style>
+        main { flex: 1; padding: 2.5rem 2rem; }
+        .glass-detail-container {
+            background: rgba(34, 40, 60, 0.55);
+            backdrop-filter: blur(16px) saturate(1.2);
+            border-radius: 28px;
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+            color: #fff;
+            padding: 2.5rem 2rem;
+            margin: 2rem auto;
+            max-width: 1100px;
+        }
+        .card, .card-header, .description-content, .list-group-item {
+            background: rgba(34, 40, 60, 0.55) !important;
+            backdrop-filter: blur(16px) saturate(1.2);
+            border-radius: 22px !important;
+            border: 1.5px solid rgba(255,255,255,0.13) !important;
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+            color: #fff !important;
+        }
+        .card-title {
+            color: #222;
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        .card-subtitle {
+            color: #8a2be2 !important;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+        }
+        .card-header h2 {
+            color: #532ab9 !important;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .btn-outline-primary, .btn-outline-danger {
+            border-radius: 25px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 600;
+            background: linear-gradient(90deg, #f5f6fa 60%, #e3e6ee 100%);
+            border: 1.5px solid #532ab9;
+            color: #532ab9 !important;
+            transition: all 0.2s;
+            box-shadow: 0 2px 12px 0 rgba(83,42,185,0.08);
+        }
+        .btn-outline-primary:hover, .btn-outline-danger:hover {
+            background: linear-gradient(90deg, #8a2be2 60%, #532ab9 100%) !important;
+            color: #fff !important;
+            box-shadow: 0 0 18px #8a2be2;
+        }
+        .badge.bg-primary {
+            background: linear-gradient(90deg, #532ab9, #8a2be2) !important;
+            color: #fff !important;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.5em 1em;
+            border-radius: 12px;
+        }
+        .bg-light.description-content {
+            background: rgba(255,255,255,0.08) !important;
+            color: #fff !important;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.13);
+            font-size: 1.08rem;
+            font-weight: 400;
+        }
+        .list-group-item {
+            background: rgba(34, 40, 60, 0.35) !important;
+            border: none !important;
+        }
+        .glass-detail-container h5, .glass-detail-container h3 {
+            color: #532ab9;
+            font-weight: 700;
+            margin-top: 1.2rem;
+        }
+        .glass-detail-container ul {
+            margin-bottom: 0.5rem;
+        }
+        .glass-detail-container .badge.bg-secondary {
+            background: #e3e6ee;
+            color: #532ab9;
+            font-weight: 600;
+            font-size: 0.98rem;
+        }
+        @@media (max-width: 900px) {
+            .glass-detail-container { padding: 1.2rem 0.5rem; }
+            main { padding: 1.2rem 0.5rem; }
+            aside { min-width: 60px; padding: 1rem 0.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fondo y gradientes -->
+    <div class="gradient-bg">
+        <svg xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <filter id="goo">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+                    <feBlend in="SourceGraphic" in2="goo" />
+                </filter>
+            </defs>
+        </svg>
+        <div class="gradients-container">
+            <div class="g1"></div>
+            <div class="g2"></div>
+            <div class="g3"></div>
+            <div class="g4"></div>
+            <div class="g5"></div>
+            <div class="interactive"></div>
+        </div>
+    </div>
+    <div class="app-window">
+        <!-- Sidebar -->
+        <aside>
+            <nav class="nav nav--main">
+                <ul>
+                    <li>
+                        <a asp-controller="Music" asp-action="Dashboard"><i class="fas fa-headphones"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Music" asp-action="Trending"><i class="fas fa-fire"></i> Trending</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Music" asp-action="TopTracksArtista"><i class="fas fa-star"></i> Top Tracks Artistas</a>
+                    </li>
+                </ul>
+            </nav>
+            <nav class="nav nav--has-icons">
+                <h3>Library</h3>
+                <ul>
+                    <li>
+                        <a asp-controller="Music" asp-action="Playlist"><i class="fas fa-list"></i> Playlists</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Music" asp-action="Lyrics"><i class="fas fa-music"></i> Lyrics</a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        <main>
+            <div class="glass-detail-container">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card mb-4">
+                                <img src="@Model.song_art_image_url" class="card-img-top" alt="@Model.full_title" style="background-color: @Model.song_art_primary_color">
+                                <div class="card-body">
+                                    <h1 class="card-title">@Model.title</h1>
+                                    <h3 class="card-subtitle mb-3">@Model.primary_artist_names</h3>
+                                    @if (Model.album != null)
+                                    {
+                                        <div class="mb-3">
+                                            <h5>Álbum</h5>
+                                            <p>@Model.album.name</p>
+                                            <img src="@Model.album.cover_art_url" class="img-fluid" alt="@Model.album.name" style="max-width: 200px;">
+                                        </div>
+                                    }
+                                    <div class="mb-3">
+                                        <h5>Fecha de lanzamiento</h5>
+                                        <p>@Model.release_date_for_display</p>
+                                    </div>
+                                    @if (Model.producer_artists != null && Model.producer_artists.Any())
+                                    {
+                                        <div class="mb-3">
+                                            <h5>Productores</h5>
+                                            <ul>
+                                                @foreach (var producer in Model.producer_artists)
+                                                {
+                                                    <li>@producer.name</li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    }
+                                    @if (Model.writer_artists != null && Model.writer_artists.Any())
+                                    {
+                                        <div class="mb-3">
+                                            <h5>Escritores</h5>
+                                            <ul>
+                                                @foreach (var writer in Model.writer_artists)
+                                                {
+                                                    <li>@writer.name</li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    }
+                                    <div class="d-flex justify-content-between">
+                                        <a href="@Model.url" class="btn btn-outline-primary" target="_blank">Ver en Genius</a>
+                                        @if (!string.IsNullOrEmpty(Model.youtube_url))
+                                        {
+                                            <a href="@Model.youtube_url" class="btn btn-outline-danger" target="_blank">Ver en YouTube</a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Información detallada -->
+                        <div class="col-md-8">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h2>Detalles</h2>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5>Estadísticas</h5>
+                                            <ul class="list-group mb-4">
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    Anotaciones
+                                                    <span class="badge bg-primary rounded-pill">@Model.annotation_count</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    Contribuidores
+                                                    <span class="badge bg-primary rounded-pill">@Model.stats.contributors</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(Model.description_preview))
+                                    {
+                                        <div class="mt-4">
+                                            <h5>Descripción</h5>
+                                            <div class="p-3 bg-light rounded description-content">
+                                                @Html.Raw(Model.description.html)
+                                            </div>
+                                        </div>
+                                    }
+                                    @if (Model.song_relationships != null && Model.song_relationships.Any())
+                                    {
+                                        <div class="mt-4">
+                                            <h5>Relaciones</h5>
+                                            <div class="list-group">
+                                                @foreach (var rel in Model.song_relationships)
+                                                {
+                                                    <div class="list-group-item">
+                                                        <h6>@rel.relationship_type</h6>
+                                                        @if (rel.songs != null)
+                                                        {
+                                                            <ul>
+                                                                @foreach (var song in rel.songs)
+                                                                {
+                                                                    <li>
+                                                                        <a href="@song.url" target="_blank">@song.full_title</a>
+                                                                    </li>
+                                                                }
+                                                            </ul>
+                                                        }
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            @if (Model.tags != null && Model.tags.Any())
+                            {
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5>Etiquetas</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        @foreach (var tag in Model.tags)
+                                        {
+                                            <span class="badge bg-secondary me-1">@tag.name</span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/song-detail-effects.js"></script>
+</body>
+</html>

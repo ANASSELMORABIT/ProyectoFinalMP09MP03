@@ -1,0 +1,481 @@
+@model PRJ_FINAL_MP09_MP03.Models.MusicViewModel
+@{
+    Layout = null;
+}
+
+@{
+    ViewData["Title"] = "Buscar Lyrics";
+    
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard Musical</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <!-- Estilo personalizado -->
+    <link href="~/css/dashboard.css" rel="stylesheet" />
+
+    <style>
+
+    body{
+      color: #f4f4f4;
+    }
+    .glass-searchbar {
+      background: rgba(255,255,255,0.13);
+      backdrop-filter: blur(16px) saturate(1.2);
+      -webkit-backdrop-filter: blur(16px) saturate(1.2);
+      border-radius: 22px;
+      box-shadow: 0 8px 32px 0 rgba(31,38,135,0.10);
+      padding: 0.35em 1.2em 0.35em 0.8em;
+      gap: 0.7em;
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      border: 1.5px solid rgba(255,255,255,0.13);
+    }
+    .glass-searchbar input::placeholder { color: #999; }
+
+    .glass-search-icon {
+      color: #8a2be2;
+      font-size: 1.25em;
+      margin-right: 0.3em;
+      filter: drop-shadow(0 2px 8px rgba(138,43,226,0.10));
+    }
+
+    .glass-search-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #222;
+      font-size: 1.08rem;
+      font-weight: 500;
+      flex: 1;
+      padding: 0.5em 0.7em;
+      border-radius: 12px;
+      transition: background 0.18s;
+    }
+
+    .glass-search-input::placeholder {
+      color: #8a2be2;
+      opacity: 0.7;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-apple-search {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6em;
+      background: linear-gradient(90deg, #532ab9, #8a2be2);
+      color: #fff;
+      box-shadow: 0 0 12px #8a2be2;
+      transition: all 0.2s;
+      border: none;
+      border-radius: 18px;
+      padding: 0.55em 1.5em;
+      font-size: 1.08rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-apple-search:hover, .btn-apple-search:focus {
+      background:#8a2be2;
+      color: #fff;
+      box-shadow: 0 0 18px #532ab9;
+      transform: translateY(-2px) scale(1.04);
+    }
+    
+    .sidebar-logout {
+      margin-top: 2.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      justify-content: flex-start;
+    }
+    .logout-link {
+      color: #ff4d4f;
+      font-weight: 700;
+      font-size: 1.08rem;
+      border-radius: 12px;
+      padding: 0.5rem 1.2rem;
+      background: rgba(255,77,79,0.08);
+      transition: background 0.18s, color 0.18s;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.7em;
+    }
+    .logout-link i {
+      font-size: 1.2em;
+    }
+    .logout-link:hover {
+      background: rgba(255,77,79,0.18);
+      color: #fff;
+    }
+
+
+
+
+
+    /* Contenedor del aside (navbar lateral) */
+aside {
+  width: 260px;
+  background: linear-gradient(180deg, #1a1a2e, #16213e);
+  color: #e0e0ff;
+  box-shadow: 3px 0 12px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.5rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  user-select: none;
+}
+
+/* Estilos generales para los nav dentro del aside */
+aside nav {
+  margin-bottom: 2.5rem;
+}
+
+/* Títulos de secciones */
+aside nav h3 {
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #a1a1ff;
+  border-bottom: 1px solid #444877;
+  padding-bottom: 0.3rem;
+}
+
+/* Listas dentro del nav */
+aside nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Items de la lista */
+aside nav ul li {
+  margin-bottom: 1.1rem;
+}
+
+/* Links del navbar */
+aside nav ul li a {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  text-decoration: none;
+  color: #c3c3ff;
+  font-weight: 600;
+  font-size: 1.05rem;
+  padding: 0.55rem 1rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 0 0 0 transparent;
+}
+
+/* Iconos dentro de los links */
+aside nav ul li a i {
+  font-size: 1.3rem;
+  color: #8a2be2;
+  transition: color 0.3s ease;
+}
+
+/* Hover / Focus de links */
+aside nav ul li a:hover,
+aside nav ul li a:focus {
+  color: #fff;
+  box-shadow: inset 5rem 0 10px -5px #8a2be2;
+  background: rgba(138, 43, 226, 0.15);
+  outline: none;
+}
+
+/* Cambiar color del icono al hover */
+aside nav ul li a:hover i,
+aside nav ul li a:focus i {
+  color: #fff;
+}
+
+/* Item seleccionado (activo) */
+.nav-item--selected a {
+  color: #fff;
+  font-weight: 700;
+  background: linear-gradient(90deg, #8a2be2, #532ab9);
+  box-shadow: 0 0 15px #8a2be2;
+}
+
+/* Logout botón estilizado */
+.sidebar-logout {
+  margin-top: auto;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(138, 43, 226, 0.3);
+  display: flex;
+  justify-content: flex-start;
+}
+
+.logout-link {
+  color: #ff4d4f;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  padding: 0.6rem 1.5rem;
+  background: rgba(255, 77, 79, 0.1);
+  transition: background 0.3s, color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  text-decoration: none;
+  box-shadow: 0 0 8px rgba(255, 77, 79, 0.2);
+}
+
+.logout-link i {
+  font-size: 1.4rem;
+  color: #ff4d4f;
+  transition: color 0.3s;
+}
+
+.logout-link:hover,
+.logout-link:focus {
+  background: #ff4d4f;
+  color: #fff;
+  box-shadow: 0 0 16px #ff4d4f;
+  outline: none;
+}
+
+.logout-link:hover i,
+.logout-link:focus i {
+  color: #fff;
+}
+
+    
+    </style>
+</head>
+<body>
+    <!-- Fondo y gradientes -->
+    <div class="gradient-bg">
+      <svg xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="goo">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+            <feBlend in="SourceGraphic" in2="goo" />
+          </filter>
+        </defs>
+      </svg>
+      <div class="gradients-container">
+        <div class="g1"></div>
+        <div class="g2"></div>
+        <div class="g3"></div>
+        <div class="g4"></div>
+        <div class="g5"></div>
+        <div class="interactive"></div>
+      </div>
+    </div>
+
+    <div class="app-window">
+      <aside>
+        <nav class="nav nav--main">
+          <ul>
+            <li>
+              <a asp-controller="Music" asp-action="Dashboard">
+                <i class="fas fa-headphones"></i> Dashboard
+              </a>
+            </li>
+            <li>
+              <a asp-controller="Music" asp-action="Trending">
+                <i class="fas fa-fire"></i> Trending
+              </a>
+            </li>
+            <li>
+              <a asp-controller="Music" asp-action="TopTracksArtista">
+                <i class="fas fa-star"></i> Top Tracks Artistas
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <nav class="nav nav--has-icons">
+          <h3>Library</h3>
+          <ul>
+            <li>
+              <a asp-controller="Music" asp-action="Playlist">
+                <i class="fas fa-list"></i> Playlists
+              </a>
+            </li>
+            <li class="nav-item--selected">
+              <a asp-controller="Music" asp-action="Lyrics">
+                <i class="fas fa-music"></i> Lyrics
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="sidebar-logout mt-auto">
+          <a href="#" id="logout-link" class="logout-link">
+            <i class="fas fa-sign-out-alt"></i> Sign Out
+          </a>
+        </div>
+      </aside>
+      <main>
+        <form method="get" asp-controller="Music" asp-action="BuscarTrackIdLyrics" class="container mt-4 d-flex justify-content-center">
+          <div class="glass-searchbar d-flex align-items-center">
+            <i class="fas fa-search glass-search-icon"></i>
+            <input type="text" name="nombreCancion" class="glass-search-input" placeholder="Buscar canción por nombre..." required />
+            <button type="submit" class="btn-apple-search" id="searchBtn">
+              Search
+            </button>
+          </div>
+        </form>
+        <div id="resultadoLyrics" class="text-center mt-4"></div>
+        @if (TempData["TrackId"] != null)
+        {
+          <div class="alert alert-success text-center mt-4 d-none"></div>
+        }
+        else if (TempData["Error"] != null)
+        {
+          <div class="alert alert-danger text-center mt-4 d-none">
+            @TempData["Error"]
+          </div>
+        }
+      </main>
+    </div>
+    <script>
+      // Animación del botón de búsqueda (tipo buton)
+      const searchBtn = document.getElementById('searchBtn');
+      if (searchBtn) {
+        searchBtn.addEventListener('click', function (e) {
+          setTimeout(() => {
+            searchBtn.classList.add('loading');
+            setTimeout(() => {
+              searchBtn.classList.add('complete');
+              setTimeout(() => {
+                searchBtn.classList.remove('loading', 'complete');
+              }, 1200);
+            }, 1800);
+          }, 100);
+        });
+      }
+
+
+
+    </script>
+    <script>
+
+      
+      function getRandomKey(service) {
+        const keys = apiKeys[service];
+        return keys[Math.floor(Math.random() * keys.length)];
+      }
+
+
+
+      const apiKeys = {
+        spotify: [
+                 "2b961c5f6amsh1a24658823b3cfcp16a0dbjsn4dd75600868f",
+                "9fff24a057mshde49ac891d0a8ccp109664jsnd17a01a3cc3e",
+                "81c1e473e1mshf3d2b89061f1940p11e5cejsn041622432871",
+                "ca57b469famshc3e624c2eb25885p1ee0f9jsn994fda06b4fe",
+                "a8ddc044e7msheed77525071edf5p1dbddfjsn74a7fdb5839e",
+                "437b6c83dbmsh709ce040c986921p1787bcjsnc61ad9f29bce",
+                "f6baa37efemsh269a80e4b87fb3ap19e24fjsnb2b2c7760da5",
+                "81d7983895msh81740f907f461a3p1bc21djsn5e1eff87778a",
+                "98519a535amshac3f32209ab2720p1e1a69jsna54a4e19c1bb",
+                "5fb3e1f733msh5bf059e1e314bcbp1cea66jsnd45fd6843896",
+                "aae6342304msh8e8cd656edbfd35p166090jsn23b21fd8411e",
+                "85771db6f9msh603c712eb737573p1ef7f0jsn6a7c56da54eb",
+                "3a6bcf96a9mshe64c1a25d9efbc4p1658ffjsnc8d8b4a5c3ff",
+                "65352cbfbdmsh41895178b3d3cb7p16d0cdjsna5fe72f6b47d",
+                "4cd8e168bfmsh116d725d9cdfc95p18be7fjsn4ffa51408767",
+                "00463914ccmshbf5a75c05c08897p19c32bjsne4cd312c9a5a",
+                "ccde20cf00mshf9ac2f75c361ba8p16d799jsnc10a85f2fa28",
+                "d86d9cda43msh3471e52cb2ec90ep1cdbdejsn0f31b6037a60",
+                "5ced4c3982msh473f2a7f6d12bd4p1e6b21jsne093e36747ce",
+                "09c15b827emshdb838b0caeea2f6p1c14a1jsn451e0abd75bb",
+                "66fc9336f2msh88a3c771b94b53fp15d9bbjsn7220523955d3",
+                "38180f0048mshb76cc08aa62815bp19d68djsnda5a5934eeda",
+                "7b3135c8b3mshd4e303f0e6fb1f8p164379jsn17de2ec15954",
+                "2ff71034camsh50d9ac936603e4fp155791jsn40224801316c"
+        ]
+      };
+
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const trackId = @Html.Raw(Json.Serialize(TempData["TrackId"]));
+        const nombreCancion = document.querySelector('input[name="nombreCancion"]')?.value || '';
+        if (!trackId) return;
+
+        const resultado = document.getElementById("resultadoLyrics");
+        resultado.innerHTML = "<p>Buscando letras...</p>";
+
+
+
+        try {
+          const response = await fetch(`https://spotify81.p.rapidapi.com/track_lyrics?id=${trackId}`, {
+            method: "GET",
+            headers: {
+              "x-rapidapi-key": getRandomKey('spotify'),
+              "x-rapidapi-host": "spotify81.p.rapidapi.com"
+            }
+          });
+
+          if (!response.ok) throw new Error("No se pudo obtener la letra de la canción.");
+
+          const data = await response.json();
+          const lines = data.lyrics?.lines;
+          // Obtener el nombre de la canción si está disponible
+          const songTitle = data.name || nombreCancion || 'Letra';
+
+          if (!lines || lines.length === 0) {
+            resultado.innerHTML = "<p>No se encontraron letras para esta canción.</p>";
+            return;
+          }
+
+          const lyricsHtml = lines.map(line => line.words).join('<br>');
+          resultado.innerHTML = `<h4>${songTitle}</h4><p>${lyricsHtml}</p>`;
+
+        } catch (error) {
+          resultado.innerHTML = `<p class="text-danger">Error al obtener letras: ${error.message}</p>`;
+          console.error(error);
+        }
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const logoutLink = document.getElementById('logout-link');
+        if (logoutLink) {
+          logoutLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            Swal.fire({
+              title: '¿Seguro que quieres salir?',
+              text: "Se cerrará tu sesión.",
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#d33',
+              cancelButtonColor: '#3085d6',
+              confirmButtonText: 'Sí, salir',
+              background: '#1a1a1a',
+              color: '#f1f1f1',
+              customClass: {
+                popup: 'rounded-4 shadow-lg',
+                confirmButton: 'btn btn-danger',
+                cancelButton: 'btn btn-secondary me-3'
+              }
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.href = '/Account/Logout';
+              }
+            });
+          });
+        }
+      });
+    </script>
+</body>
+</html>

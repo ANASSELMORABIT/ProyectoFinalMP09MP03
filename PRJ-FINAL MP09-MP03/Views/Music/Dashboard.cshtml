@@ -1,0 +1,710 @@
+@model PRJ_FINAL_MP09_MP03.Models.MusicViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Dashboard Musical";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard Musical</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Estilo personalizado -->
+    <link href="~/css/dashboard.css" rel="stylesheet" />
+    <style>
+        .visually-hidden {
+          position: absolute !important;
+          width: 1px; height: 1px;
+          padding: 0; margin: -1px;
+          overflow: hidden; clip: rect(0,0,0,0);
+          border: 0;
+        }
+        .app-window { display: flex; min-height: 100vh; }
+        aside {
+            min-width: 220px;
+            background: rgba(34, 40, 60, 0.7);
+            backdrop-filter: blur(16px);
+            border-right: 1.5px solid rgba(255,255,255,0.13);
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 2rem 1rem 1rem 1rem;
+        }
+        .nav--main ul, .nav--has-icons ul { list-style: none; padding: 0; }
+        .nav--main ul li, .nav--has-icons ul li { margin-bottom: 1.2rem; }
+        .nav--main a, .nav--has-icons a {
+            color: #fff; text-decoration: none; font-weight: 600; font-size: 1.1rem;
+            display: flex; align-items: center; gap: 0.7rem; border-radius: 12px; padding: 0.5rem 1rem;
+            transition: background 0.2s;
+        }
+        .nav--main a:hover, .nav--has-icons a:hover, .nav-item--selected a {
+            background: linear-gradient(90deg, #532ab9 60%, #8a2be2 100%);
+            color: #fff;
+        }
+        .nav--has-icons h3 { color: #8a2be2; font-size: 1rem; margin-bottom: 0.7rem; }
+        main { flex: 1; padding: 2.5rem 2rem; }
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 2rem;
+        }
+        .top-bar__search {
+            background: rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: 0.5rem 1.2rem;
+            display: flex; align-items: center; gap: 0.7rem;
+            box-shadow: 0 2px 12px 0 rgba(83,42,185,0.08);
+        }
+        .top-bar__search input {
+            background: transparent; border: none; color: #fff; outline: none;
+            font-size: 1rem; width: 180px;
+        }
+        .top-bar__user a {
+            color: #fff; font-size: 1.3rem; margin-left: 1.2rem;
+            transition: color 0.2s;
+        }
+        .top-bar__user a:hover { color: #8a2be2; }
+        .screen-title {
+            color: #fff; font-size: 2.2rem; font-weight: 700; margin-bottom: 1.5rem;
+            letter-spacing: 1px; text-shadow: 0 2px 12px #532ab9;
+        }
+        .card.h-100 {
+            background: rgba(34, 40, 60, 0.55) !important;
+            backdrop-filter: blur(16px) saturate(1.2);
+            border-radius: 22px !important;
+            border: 1.5px solid rgba(255,255,255,0.13) !important;
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+            color: #fff !important;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card.h-100:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 16px 40px 0 rgba(83,42,185,0.18);
+        }
+        .card-title { color: #8a2be2 !important; font-weight: 700; }
+        .btn.btn-primary {
+            background: linear-gradient(90deg, #532ab9, #8a2be2);
+            color: #fff;
+            border-radius: 25px;
+            padding: 0.7rem 1.5rem;
+            font-weight: 600;
+            border: none;
+            box-shadow: 0 0 12px #8a2be2;
+            transition: all 0.2s;
+        }
+        .btn.btn-primary:hover {
+            background: #8a2be2;
+            color: #fff;
+            box-shadow: 0 0 18px #532ab9;
+        }
+        .alert {
+            background: rgba(255,255,255,0.08) !important;
+            color: #fff !important;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.13);
+        }
+        .player {
+            background: rgba(34, 40, 60, 0.85);
+            border-top: 1.5px solid rgba(255,255,255,0.13);
+            box-shadow: 0 -4px 24px 0 rgba(83,42,185,0.12);
+        }
+        @@media (max-width: 900px) {
+            .app-window { flex-direction: column; }
+            aside { min-width: 100%; border-right: none; border-bottom: 1.5px solid rgba(255,255,255,0.13); flex-direction: row; }
+            main { padding: 1.2rem 0.5rem; }
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Fondo y gradientes -->
+    <div class="gradient-bg">
+        <svg xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <filter id="goo">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+                    <feBlend in="SourceGraphic" in2="goo" />
+                </filter>
+            </defs>
+        </svg>
+        <div class="gradients-container">
+            <div class="g1"></div>
+            <div class="g2"></div>
+            <div class="g3"></div>
+            <div class="g4"></div>
+            <div class="g5"></div>
+            <div class="interactive"></div>
+        </div>
+    </div>
+    <div class="app-window">
+        <!-- Sidebar -->
+        <aside aria-label="Barra lateral de navegación">
+            <nav class="nav nav--main" aria-label="Menú principal">
+                <ul>
+                    <li class="nav-item--selected">
+                        <a asp-controller="Music" asp-action="Dashboard">
+                            <i class="fas fa-headphones" aria-hidden="true"></i> Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Music" asp-action="Trending">
+                            <i class="fas fa-fire" aria-hidden="true"></i> Trending
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Music" asp-action="TopTracksArtista">
+                            <i class="fas fa-star" aria-hidden="true"></i> Top Tracks Artistas
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <nav class="nav nav--has-icons" aria-label="Biblioteca">
+                <h3>Library</h3>
+                <ul>
+                    <li>
+                        <a asp-controller="Music" asp-action="Playlist">
+                            <i class="fas fa-list" aria-hidden="true"></i> Playlists
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Music" asp-action="Lyrics">
+                            <i class="fas fa-music" aria-hidden="true"></i> Lyrics
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-logout mt-auto">
+              <a href="#" class="logout-link" aria-label="Cerrar sesión">
+                <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                <span class="visually-hidden">Cerrar sesión</span>
+              </a>
+            </div>
+        </aside>
+        <!-- Main -->
+        <main role="main">
+            <div class="top-bar">
+                <div class="top-bar__search">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    <form method="get" asp-controller="Music" asp-action="BuscarTrackId">
+                        <label for="nombreCancion" class="visually-hidden">Buscar canción</label>
+                        <input type="text" id="nombreCancion" name="nombreCancion" placeholder="Buscar canción..." required />
+                    </form>
+                    <div id="loader" class="loading-spinner visually-hidden" aria-hidden="true"></div>
+
+                </div>
+                <div class="top-bar__user">
+                    <a asp-controller="Account" asp-action="Profile" aria-label="Perfil">
+                        <i class="fas fa-user" aria-hidden="true"></i>
+                    </a>
+                    <a href="#" class="logout-link text-danger" aria-label="Cerrar sesión">
+                        <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                        <span class="visually-hidden">Cerrar sesión</span>
+                    </a>
+                </div>
+            </div>
+            <div id="downloadResult"></div>
+            <h1 class="screen-title">Recomendaciones Musicales</h1>
+            @if (TempData["TrackId"] != null)
+            {
+                <div class="alert alert-success text-center mt-4">
+                    <div id="loader" class="loading-spinner visually-hidden" aria-hidden="true"></div>
+
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            const trackId = '@TempData["TrackId"]';
+                            if (trackId !== '') {
+                                // Mostrar el loader
+                                const loader = document.getElementById('loader');
+                                loader.classList.remove('visually-hidden');
+                                loader.setAttribute('aria-hidden', 'false');
+
+                                // Llamar a la función
+                                getTrackUrlFromApi(trackId)
+                                    .finally(() => {
+                                        // Ocultar el loader después de que termine (éxito o error)
+                                        loader.classList.add('visually-hidden');
+                                        loader.setAttribute('aria-hidden', 'true');
+                                    });
+                            }
+                        });
+                    </script>
+                </div>
+
+            }
+            else if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger text-center mt-4">
+                    <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
+                </div>
+            }
+            @if (Model.Recommendations != null && Model.Recommendations.Any())
+            {
+                <div class="container mt-4">
+                    <div class="row row-cols-1 row-cols-md-3 g-4">
+                        @foreach (var rec in Model.Recommendations)
+                        {
+                            var song = rec.recommended_song;
+                            <div class="col">
+                                <div class="card h-100 shadow-sm">
+                                    <img src="@song.song_art_image_url" class="card-img-top" alt="Imagen de @song.title">
+                                    <div class="card-body">
+                                        <h5 class="card-title">@song.title</h5>
+                                        <p class="card-text"><strong>Artista:</strong> @song.artist_names</p>
+                                        <a asp-controller="Music" asp-action="SongDetails" asp-route-id="@song.id" class="btn btn-primary mt-2">
+                                            <i class="fas fa-info-circle"></i> Ver Detalles
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning text-center mt-5">
+                    <i class="fas fa-exclamation-triangle"></i> No se encontraron recomendaciones musicales.
+                </div>
+            }
+        </main>
+        <!-- Player -->
+        <div class="player" style="display: none;">
+            <i class="fas fa-expand player__dock player__max"></i>
+            <i class="fas fa-compress player__dock player__min"></i>
+            <div class="player__left">
+                <img src="" alt="Album Cover" class="player__pic" id="playerAlbumCover" />
+                <div class="now-playing">
+                    <span class="now-playing--title" id="playerTitle"></span>
+                    <span class="now-playing--artist" id="playerArtist"></span>
+                </div>
+            </div>
+            <div class="player__centre">
+                <div class="player-actions">
+                    <i class="fas fa-step-backward" id="prevTrack"></i>
+                    <i class="fas fa-play" id="playPauseBtn"></i>
+                    <i class="fas fa-step-forward" id="nextTrack"></i>
+                </div>
+                <div class="player-progress">
+                    <span id="currentTime">0:00</span>
+                    <div class="player-progress-bar">
+                        <div class="player-progress-bar-done" id="progressBar"></div>
+                    </div>
+                    <span id="duration">0:00</span>
+                </div>
+            </div>
+            <div class="player__right">
+                <i class="fas fa-volume-up" id="volumeIcon"></i>
+                <div class="player-progress-bar">
+                    <div class="player-progress-bar-done" id="volumeBar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Toast notification -->
+    <div id="toastApple" class="toast-apple" style="display:none;">
+        <span class="toast-icon"><i class="fas fa-check-circle"></i></span>
+        <span class="toast-msg"></span>
+    </div>
+    <div id="appleToast" class="apple-toast"></div>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.logout-link').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: '¿Seguro que quieres cerrar sesión?',
+                        text: "Se cerrará tu sesión en la aplicación.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Sí, cerrar sesión',
+                        background: '#1a1a1a',
+                        color: '#f1f1f1',
+                        customClass: {
+                            popup: 'rounded-4 shadow-lg',
+                            confirmButton: 'btn btn-danger',
+                            cancelButton: 'btn btn-secondary me-3'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/Account/Logout';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+    <script>
+const apiKeys = {
+    MusicApis : [
+                "3985f53dc8msh9c15680f95d2864p1b408ajsnc61d1713b36a",
+                "86a7bf4e34mshaf5f880211c2826p15185djsnd747916cda85",
+                "d5839bbb1emshe750ab49434039cp1ceeddjsn691b5ec6ee90",
+                "6c78710d80mshaab1639b4a2f43bp17a136jsn7506fbaaa118",
+                "da5cb8f3admsh95ce57d749cec13p1967c6jsn85ba5ece5eba",
+                "f6e6825361msheb1cfd8c3ac6b9cp19fe4ajsn300fd9c474ff",
+                "0f084d9bfbmshfe369dc74c8e150p145b04jsn0c7b3b89574a",
+                "0a8d08f0eemsh2b231cd38fc4804p119d8fjsn482b439163d1",
+                "178fe5bafdmsh4f85734d804947bp17546bjsna676959250ae",
+                "172e9bba04msh4e8835e94e71c83p17c541jsnae1dea977ac6",
+                "d9141f2b07msh62d6719333fa2f6p163487jsn6e027dbc1436",
+                "a648e802f7mshfab664717d5a822p124fb3jsn953b8750acee",
+                "8fa7739482msh9a806517ef26c2ep1790d6jsnc0cf125f2ee9",
+                "4c245b7f76msh3abf65f10935a86p1bb712jsn6cbce75f9b8a",
+                "3a5c4273demsh13db258a9838e8dp13dc5fjsne59b4ab152aa",
+                "386c5911fdmsh3538e647a8ca6c5p1d4041jsn0f4db79dbae5",
+                "2265c4857emsh66cab1212c65ca5p1f6eeejsn24bc722c142c",
+                "cd971d59dbmsh4aebfd1426fd7e4p10c405jsndee9ed130e16",
+                "9b49a31b74msh27330860396329bp173f08jsn42c685e3bfe4",
+                "f6832d3e7dmsh552f916c64d7be2p1d4e35jsn8986f4fc9242",
+                "4a7dbcfbd0mshee5571db02742f2p1e2e27jsn9df0290cd663",
+                "23819bd9famshb3b845a5bd90b3fp14ac61jsn3908c31c182c",
+                "776be17c33msh3509756a9fb0c7cp1ac74cjsn9befdaa2f1e2",
+                "e7c569125amshc79b1169a431e80p1530e3jsn915be63c3afa",
+                "b708211c0dmsh54485bbbdfc99c9p1fa74ejsn1c730d45d8c6",
+                "3b6165888cmsh5ef9d241fc3b30ep1a6ef8jsn8a0c0a71adac",
+                "380413a58bmsh9dfd36b85af74e3p190776jsn3a6151d3425b",
+                "4e6ad826aamsh3fe7f2ebf920f4cp15ace9jsn7edd16a0009e",
+                "80e3fcb8b3msh5faaaa4501303e0p15bf6cjsn82bb0d20bc4a",
+                "fe30ed2a86msh580427eb1643843p138486jsn8449b075e52e",
+                "0509c9014fmsh998e84d2df3e3cdp150c9ejsn67f0ca3fa95f",
+                "6ebb8cf621msh5963ccaa79ce4d6p1ed0bfjsne49a08752d7b",
+                "9435a3b059mshbb9f993efc44a0ap14e9b1jsnf1e115f46ade",
+                "a53a0826c0msh6ee0e614738a767p1df215jsn34c6a4f325a0",
+                "90a3f20f7fmshbdefaac6480f498p1422ffjsn35772f7a8bc2",
+                "2ecd6aa386msh3cc8a3977034efbp112dbfjsn6763bb291e79",
+                "79e29fb911mshef0ff5492592e5dp18ba17jsnb2b47d3c0ec7",
+                "c8afeec66dmshc46f77d388840c0p1c3742jsnd2ab3a9f69ef",
+                "b772056fe4msh7baa4c5118a400cp162cc0jsn5f231edda761",
+                "1de95a09e4mshc29cbd9f900af08p1e1ccejsn96981c2adb32",
+                "95861a1f65mshcaa98cc7cd70719p153a54jsn0c41702940b9",
+                "bad9b6beb3mshe1c5510a0db1250p155f63jsnd0e3f8ae19a5",
+                "cba629d11dmsh7319bcdc0af54f6p1c431ajsn4fa353e998a9",
+                "86348578cdmsh02f3f297e205ff3p14ae70jsn31c3c3dc421d",
+                "a6adacfa49msh7a066f7e91aef59p1a7556jsn9ead181b8d34",
+                "d41dab6610msh1d18999974bc920p1f82a6jsn7293e2062e07",
+                "1d9e13826dmsh828871cd95f73d7p13a5a7jsnbc8ea252b537",
+                "f1dd78fa7dmshcc55560e47dcf51p19b21djsndb76cf5d7ca1",
+                "fa800e5859msh66b67e0832f2025p128296jsndfa6749ee392",
+                "47cb1df0f2msh9fc3c4a4fce747bp1bcb19jsne73b233d38ca",
+                "eb60ee14f7mshab43243db9a15c9p1908cajsn58c961f0e54c",
+                "07090faf6amsh4a48572412b7065p10e284jsn9d5a270c6c05",
+                "9fbf6ee9a6mshdea4a9ea315681dp1b3fffjsnbaf6481e0970",
+                "df36816d13msh10e65ff4dc86d87p12b1f3jsne406d7897194",
+                "e21ddbaf95msh15cd17271c71c42p15183djsnae72967f2d06",
+                "42a7f3f148msh694d01ba2038ab4p199778jsnf33aa9229ff9",
+                "d11a283d82mshc4617f3b0132c20p10b291jsnb200f0e4991f",
+                "53b24b08c8mshf61178d79471fa7p1400f4jsn6fecd54140a5",
+                "ab0e40b482msh18871d35122464fp1edaedjsn206af4cfd05e",
+                "94d426ad4amsh14c8f8432fa7671p146158jsne07000bd0510",
+                "ec55ad43f4msha9cfcd80ea94580p149b9fjsn892bcfeef149"
+            ]
+};
+
+
+function getRandomKey(service) {
+    const keys = apiKeys[service];
+    return keys[Math.floor(Math.random() * keys.length)];
+}
+
+async function guardarTrackEnPlaylist(datosTrack) {
+
+    console.log("Guardando track en playlist:", datosTrack);
+    const response = await fetch('/Music/GuardarPlaylist', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() // si usas antiforgery token
+        },
+        body: JSON.stringify(datosTrack)
+    });
+
+    if (!response.ok) {
+        throw new Error("Error guardando track en playlist");
+    }
+
+    return await response.json();
+}
+
+
+
+async function getTrackUrlFromApi(trackId) {
+    
+    const spotifyDataApiUrl = `https://spotify-data.p.rapidapi.com/tracks/?ids=${trackId}`;
+    const encodedTrackUrl = encodeURIComponent(`https://open.spotify.com/track/${trackId}`);
+    const downloaderApiUrl = `https://spotify-downloader9.p.rapidapi.com/downloadSong?songId=${encodedTrackUrl}`;
+
+    
+    const downloaderOptions = {
+        method: 'GET',
+        headers: {
+            'x-rapidapi-key': getRandomKey('MusicApis'),
+            'x-rapidapi-host': 'spotify-downloader9.p.rapidapi.com'
+        }
+    };
+
+    const dataOptions = {
+        method: 'GET',
+        headers: {
+            'x-rapidapi-key': getRandomKey('MusicApis'),
+            'x-rapidapi-host': 'spotify-data.p.rapidapi.com'
+        }
+    };
+
+    const youtubeOptions = {
+        method: 'GET',
+        headers: {
+            'x-rapidapi-key': getRandomKey('MusicApis'),
+            'x-rapidapi-host': 'youtube138.p.rapidapi.com'
+        }
+    };
+
+    const youtubeMp3Options = {
+        method: 'GET',
+        headers: {
+            'x-rapidapi-key': getRandomKey('MusicApis'),
+            'x-rapidapi-host': 'youtube-mp36.p.rapidapi.com'
+        }
+    };
+    try {
+        // Obtener el MP3
+        const DownloadResponse = await fetch(downloaderApiUrl, downloaderOptions);
+        const DownloadResult = await DownloadResponse.json();
+
+
+          if (!DownloadResult.success || !DownloadResult.data?.downloadLink) {
+            throw new Error("No se pudo obtener el MP3 desde la nueva API.");
+        }
+
+        
+        const mp3Url = DownloadResult.data.downloadLink;
+        const fallbackTitle = DownloadResult.data.title;
+
+        // Obtener los detalles de la canción
+        const dataResponse = await fetch(spotifyDataApiUrl, dataOptions);
+        const dataResult = await dataResponse.json();
+
+        const track = dataResult.tracks?.[0];
+        if (!track) {
+            throw new Error("No se pudieron obtener los detalles de la canción.");
+        }
+
+        const title = track.name || fallbackTitle;
+        const artists = track.artists.map(a => a.name).join(", ");
+        const albumName = track.album.name;
+        const imageUrl = track.album.images?.[0]?.url || "";
+        const releaseDate = track.album.release_date;
+        const popularity = track.popularity;
+
+        const YoutubeVideoId = `https://youtube138.p.rapidapi.com/search/?q=${encodeURIComponent(title)}&hl=en&gl=ES`; 
+        
+        const youtubeResponse = await fetch(YoutubeVideoId, youtubeOptions);
+        const youtubeResult = await youtubeResponse.json();
+        const videoId = youtubeResult.contents?.[0]?.video?.videoId;
+
+        const YoutubeMp3Url = `https://youtube-mp36.p.rapidapi.com/dl?id=${videoId}`;
+
+        const youtubeResponseMp3 = await fetch(YoutubeMp3Url, youtubeMp3Options);
+        const youtubeResultMp3 = await youtubeResponseMp3.json();
+        const mp3UrlMp3 = youtubeResultMp3.link;
+
+        const datosTrack = {
+          nombreCancion: title,
+          artista: artists,
+          urlMusica: mp3Url,
+          urlDescarga: mp3UrlMp3,
+          urlImg: imageUrl,
+          idTrack: trackId
+      };
+
+        
+        try {
+            const resultadoGuardado = await guardarTrackEnPlaylist(datosTrack);
+            console.log(resultadoGuardado.message);
+        } catch(error) {
+            console.error("No se pudo guardar el track:", error);
+        }
+
+        // Mostrar card con los datos
+       document.getElementById("downloadResult").innerHTML = `
+            <div class="music-card">
+                <h2>${title} - ${artists}</h2>
+                <img src="${imageUrl}" alt="Portada del álbum">
+
+                <div class="player">
+                <audio id="audio-${trackId}" src="${mp3Url}" preload="auto"></audio>
+                <div class="controls">
+                    <button onclick="document.getElementById('audio-${trackId}').play()"><i class="bi bi-play-fill"></i></button>
+                    <button onclick="document.getElementById('audio-${trackId}').pause()"><i class="bi bi-pause-fill"></i></button>
+                    <button onclick="document.getElementById('audio-${trackId}').muted = !document.getElementById('audio-${trackId}').muted"><i class="bi bi-volume-mute"></i></button>
+                    <button onclick="document.getElementById('audio-${trackId}').volume -= 0.1"><i class="bi bi-volume-down"></i></button>
+                    <button onclick="document.getElementById('audio-${trackId}').volume += 0.1"><i class="bi bi-volume-up"></i></button>
+                </div>
+                <input type="range" id="progress-${trackId}" min="0" step="0.1" value="0">
+                </div>
+
+               
+
+                <div class="card-details mt-3">
+                <p><strong>Álbum:</strong> ${albumName}</p>
+                <p><strong>Fecha de lanzamiento:</strong> ${releaseDate}</p>
+                <p><strong>Popularidad:</strong> ${popularity}</p>
+                <a href="${mp3UrlMp3}" download class="start-button">⬇️ Descargar MP3</a>
+                </div>
+        </div>`;
+        const audio = document.getElementById(`audio-${trackId}`);
+        const progress = document.getElementById(`progress-${trackId}`);
+
+        audio.addEventListener('timeupdate', () => {
+        progress.max = audio.duration || 0;
+        progress.value = audio.currentTime;
+        });
+
+        progress.addEventListener('input', () => {
+        audio.currentTime = progress.value;
+        });
+    } catch (error) {
+        document.getElementById("downloadResult").innerHTML = `
+            <div class="alert alert-danger">
+                ❌ Error al obtener datos: ${error.message}
+            </div>`;
+        console.error(error);
+    }
+}
+    </script>
+    <script>
+        // --- DASHBOARD PLAYER Y FUNCIONALIDAD ---
+        let tracks = [];
+        try { tracks = JSON.parse(localStorage.getItem('dashboardTracks')) || []; } catch (e) { tracks = []; }
+        let currentTrackIndex = tracks.length > 0 ? tracks.length - 1 : 0;
+        let isPlaying = false;
+        let currentAudio = null;
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        function updatePlayer(track) {
+            const player = document.querySelector('.player');
+            player.style.display = 'flex';
+            const albumCover = document.getElementById('playerAlbumCover');
+            albumCover.src = track.imageUrl;
+            document.getElementById('playerTitle').textContent = track.title;
+            document.getElementById('playerArtist').textContent = track.artists;
+
+            if (currentAudio) currentAudio.pause();
+            currentAudio = new Audio(track.mp3Url);
+            currentAudio.addEventListener('timeupdate', updateProgress);
+            currentAudio.addEventListener('loadedmetadata', () => {
+                document.getElementById('duration').textContent = formatTime(currentAudio.duration);
+            });
+            setupPlayerEvents();
+        }
+
+        function updateProgress() {
+            const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('currentTime').textContent = formatTime(currentAudio.currentTime);
+        }
+
+        function setupPlayerEvents() {
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const prevTrack = document.getElementById('prevTrack');
+            const nextTrack = document.getElementById('nextTrack');
+            const volumeIcon = document.getElementById('volumeIcon');
+            const volumeBar = document.getElementById('volumeBar');
+            const progressBar = document.getElementById('progressBar');
+            const albumCover = document.getElementById('playerAlbumCover');
+
+            playPauseBtn.onclick = () => {
+                if (currentAudio.paused) {
+                    currentAudio.play();
+                    playPauseBtn.classList.replace('fa-play', 'fa-pause');
+                    isPlaying = true;
+                    albumCover.classList.add('rotating');
+                } else {
+                    currentAudio.pause();
+                    playPauseBtn.classList.replace('fa-pause', 'fa-play');
+                    isPlaying = false;
+                    albumCover.classList.remove('rotating');
+                }
+            };
+            prevTrack.onclick = () => {
+                if (tracks.length > 0) {
+                    currentTrackIndex = (currentTrackIndex - 1 + tracks.length) % tracks.length;
+                    updatePlayer(tracks[currentTrackIndex]);
+                    if (isPlaying) currentAudio.play();
+                }
+            };
+            nextTrack.onclick = () => {
+                if (tracks.length > 0) {
+                    currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+                    updatePlayer(tracks[currentTrackIndex]);
+                    if (isPlaying) currentAudio.play();
+                }
+            };
+            volumeIcon.onclick = () => {
+                if (currentAudio.muted) {
+                    currentAudio.muted = false;
+                    volumeIcon.classList.replace('fa-volume-mute', 'fa-volume-up');
+                } else {
+                    currentAudio.muted = true;
+                    volumeIcon.classList.replace('fa-volume-up', 'fa-volume-mute');
+                }
+            };
+            progressBar.parentElement.onclick = (e) => {
+                const rect = progressBar.parentElement.getBoundingClientRect();
+                const pos = (e.clientX - rect.left) / rect.width;
+                currentAudio.currentTime = pos * currentAudio.duration;
+            };
+            volumeBar.parentElement.onclick = (e) => {
+                const rect = volumeBar.parentElement.getBoundingClientRect();
+                const pos = (e.clientX - rect.left) / rect.width;
+                currentAudio.volume = pos;
+                volumeBar.style.width = `${pos * 100}%`;
+            };
+        }
+
+        function showAppleToast(msg, isError = false) {
+            const toast = document.getElementById('appleToast');
+            toast.innerHTML = `
+                <span class="toast-icon">
+                    <i class="fas ${isError ? 'fa-times-circle' : 'fa-check-circle'}"></i>
+                </span>
+                <span class="toast-msg">${msg}</span>
+            `;
+            toast.classList.toggle('toast-error', isError);
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 1500);
+        }
+
+        window.addEventListener('beforeunload', () => {
+            localStorage.removeItem('dashboardTracks');
+        });
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector('.top-bar__search form');
+            const loader = document.getElementById('loader');
+
+            if (form && loader) {
+                form.addEventListener('submit', function () {
+                    loader.classList.remove("visually-hidden");
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>

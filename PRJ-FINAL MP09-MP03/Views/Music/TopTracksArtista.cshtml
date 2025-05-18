@@ -1,0 +1,458 @@
+@model List<PRJ_FINAL_MP09_MP03.Models.TopTracks.Track>
+@{
+    ViewData["Title"] = "Top Tracks del Artista";
+}
+
+@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard Musical</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <!-- Estilo personalizado -->
+    <link href="~/css/Track.css" rel="stylesheet" />
+</head>
+<body>
+
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" asp-controller="Music" asp-action="Dashboard">🎶 MusicApp</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" asp-controller="Music" asp-action="Trending">Trending</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" asp-controller="Music" asp-action="Dashboard">Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" asp-controller="Music" asp-action="Playlist">Playlist</a>
+        </li>
+
+        <li class="nav-item"></li>
+          <a class="nav-link" asp-controller="Music" asp-action="Lyrics">Lyrics</a>
+        </li>
+        
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" asp-controller="Account" asp-action="Profile">Profile</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" id="logout-link" class="nav-link text-danger">Sign Out</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  <!-- Fondo y gradientes -->
+  <div class="gradient-bg">
+    <svg xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="goo">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+          <feBlend in="SourceGraphic" in2="goo" />
+        </filter>
+      </defs>
+    </svg>
+    <div class="gradients-container">
+      <div class="g1"></div>
+      <div class="g2"></div>
+      <div class="g3"></div>
+      <div class="g4"></div>
+      <div class="g5"></div>
+      <div class="interactive"></div>
+    </div>
+  </div>
+
+<div class="container mt-5">
+
+    
+    <div class="search-container text-center">
+        <h2 id="animated-title" class="stylish-title">Top Tracks de Artista</h2>
+        <form method="post" class="search-form d-flex justify-content-center mt-3">
+            <input type="text" name="nombreArtista" class="search-input form-control me-2" placeholder="Nombre del artista..." required />
+            <button type="submit" class="search-button btn">Buscar</button>
+        </form>
+    </div>
+
+
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger text-center mt-3">
+            @TempData["Error"]
+        </div>
+    }
+
+    <div id="defaultTracks" class="row mt-4">
+        <!-- Aquí se mostrarán los tracks iniciales por JS -->
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row mt-4">
+            @foreach (var track in Model)
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 shadow">
+                        <img src="@track.album.images.FirstOrDefault()?.url" class="card-img-top" alt="@track.name" />
+                        <div class="card-body">
+                            <h5 class="card-title">@track.name</h5>
+                            <p class="card-text"><strong>Álbum:</strong> @track.album.name</p>
+                            <p class="card-text"><strong>Artista:</strong> @track.artists.FirstOrDefault()?.name</p>
+                            <p class="card-text"><strong>ID del track:</strong> @track.id</p>
+                            <a href="@track.external_urls.spotify" class="btn btn-success" target="_blank">Ver en Spotify</a>
+                            <button class="btn btn-warning mt-2 btn-magic" onclick="toggleAudioPlayer('@track.id', this)">Descargar y Escuchar</button>
+                            
+                            <!-- Contenedor para los controles de audio (inicialmente oculto) -->
+                            <div id="audio-controls-@track.id" class="mt-3 audio-controls-container" style="display: none;">
+                                <audio id="audio-player-@track.id" controls class="audio-player w-100 mb-2"></audio>
+                                <a id="download-link-@track.id" href="#" download class="btn btn-success w-100 download-link">
+                                    <i class="fas fa-download"></i> Descargar Canción
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <div id="downloadResult" class="mt-5"></div>
+</div>
+<script>
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const title = document.getElementById("animated-title");
+            title.style.opacity = 0;
+            title.style.transform = "translateY(-20px)";
+            setTimeout(() => {
+                title.style.transition = "opacity 0.8s ease, transform 0.8s ease";
+                title.style.opacity = 1;
+                title.style.transform = "translateY(0)";
+            }, 200);
+        });
+
+        // Efecto de parpadeo sutil al pasar el ratón
+        const titleEl = document.getElementById("animated-title");
+        titleEl.addEventListener("mouseenter", () => {
+            titleEl.style.textShadow = "0 0 20px #10b981, 0 0 30px #3b82f6";
+        });
+
+        titleEl.addEventListener("mouseleave", () => {
+            titleEl.style.textShadow = "0 0 10px rgba(16, 185, 129, 0.4)";
+        });
+        const apiKeys = {
+            MusicApis : [
+                "3985f53dc8msh9c15680f95d2864p1b408ajsnc61d1713b36a",
+                "86a7bf4e34mshaf5f880211c2826p15185djsnd747916cda85",
+                "d5839bbb1emshe750ab49434039cp1ceeddjsn691b5ec6ee90",
+                "6c78710d80mshaab1639b4a2f43bp17a136jsn7506fbaaa118",
+                "da5cb8f3admsh95ce57d749cec13p1967c6jsn85ba5ece5eba",
+                "f6e6825361msheb1cfd8c3ac6b9cp19fe4ajsn300fd9c474ff",
+                "0f084d9bfbmshfe369dc74c8e150p145b04jsn0c7b3b89574a",
+                "0a8d08f0eemsh2b231cd38fc4804p119d8fjsn482b439163d1",
+                "178fe5bafdmsh4f85734d804947bp17546bjsna676959250ae",
+                "172e9bba04msh4e8835e94e71c83p17c541jsnae1dea977ac6",
+                "d9141f2b07msh62d6719333fa2f6p163487jsn6e027dbc1436",
+                "a648e802f7mshfab664717d5a822p124fb3jsn953b8750acee",
+                "8fa7739482msh9a806517ef26c2ep1790d6jsnc0cf125f2ee9",
+                "4c245b7f76msh3abf65f10935a86p1bb712jsn6cbce75f9b8a",
+                "3a5c4273demsh13db258a9838e8dp13dc5fjsne59b4ab152aa",
+                "386c5911fdmsh3538e647a8ca6c5p1d4041jsn0f4db79dbae5",
+                "2265c4857emsh66cab1212c65ca5p1f6eeejsn24bc722c142c",
+                "cd971d59dbmsh4aebfd1426fd7e4p10c405jsndee9ed130e16",
+                "9b49a31b74msh27330860396329bp173f08jsn42c685e3bfe4",
+                "f6832d3e7dmsh552f916c64d7be2p1d4e35jsn8986f4fc9242",
+                "4a7dbcfbd0mshee5571db02742f2p1e2e27jsn9df0290cd663",
+                "23819bd9famshb3b845a5bd90b3fp14ac61jsn3908c31c182c",
+                "776be17c33msh3509756a9fb0c7cp1ac74cjsn9befdaa2f1e2",
+                "e7c569125amshc79b1169a431e80p1530e3jsn915be63c3afa",
+                "b708211c0dmsh54485bbbdfc99c9p1fa74ejsn1c730d45d8c6",
+                "3b6165888cmsh5ef9d241fc3b30ep1a6ef8jsn8a0c0a71adac",
+                "380413a58bmsh9dfd36b85af74e3p190776jsn3a6151d3425b",
+                "4e6ad826aamsh3fe7f2ebf920f4cp15ace9jsn7edd16a0009e",
+                "80e3fcb8b3msh5faaaa4501303e0p15bf6cjsn82bb0d20bc4a",
+                "fe30ed2a86msh580427eb1643843p138486jsn8449b075e52e",
+                "0509c9014fmsh998e84d2df3e3cdp150c9ejsn67f0ca3fa95f",
+                "6ebb8cf621msh5963ccaa79ce4d6p1ed0bfjsne49a08752d7b",
+                "9435a3b059mshbb9f993efc44a0ap14e9b1jsnf1e115f46ade",
+                "a53a0826c0msh6ee0e614738a767p1df215jsn34c6a4f325a0",
+                "90a3f20f7fmshbdefaac6480f498p1422ffjsn35772f7a8bc2",
+                "2ecd6aa386msh3cc8a3977034efbp112dbfjsn6763bb291e79",
+                "79e29fb911mshef0ff5492592e5dp18ba17jsnb2b47d3c0ec7",
+                "c8afeec66dmshc46f77d388840c0p1c3742jsnd2ab3a9f69ef",
+                "b772056fe4msh7baa4c5118a400cp162cc0jsn5f231edda761",
+                "1de95a09e4mshc29cbd9f900af08p1e1ccejsn96981c2adb32",
+                "95861a1f65mshcaa98cc7cd70719p153a54jsn0c41702940b9",
+                "bad9b6beb3mshe1c5510a0db1250p155f63jsnd0e3f8ae19a5",
+                "cba629d11dmsh7319bcdc0af54f6p1c431ajsn4fa353e998a9",
+                "86348578cdmsh02f3f297e205ff3p14ae70jsn31c3c3dc421d",
+                "a6adacfa49msh7a066f7e91aef59p1a7556jsn9ead181b8d34",
+                "d41dab6610msh1d18999974bc920p1f82a6jsn7293e2062e07",
+                "1d9e13826dmsh828871cd95f73d7p13a5a7jsnbc8ea252b537",
+                "f1dd78fa7dmshcc55560e47dcf51p19b21djsndb76cf5d7ca1",
+                "fa800e5859msh66b67e0832f2025p128296jsndfa6749ee392",
+                "47cb1df0f2msh9fc3c4a4fce747bp1bcb19jsne73b233d38ca",
+                "eb60ee14f7mshab43243db9a15c9p1908cajsn58c961f0e54c",
+                "07090faf6amsh4a48572412b7065p10e284jsn9d5a270c6c05",
+                "9fbf6ee9a6mshdea4a9ea315681dp1b3fffjsnbaf6481e0970",
+                "df36816d13msh10e65ff4dc86d87p12b1f3jsne406d7897194",
+                "e21ddbaf95msh15cd17271c71c42p15183djsnae72967f2d06",
+                "42a7f3f148msh694d01ba2038ab4p199778jsnf33aa9229ff9",
+                "d11a283d82mshc4617f3b0132c20p10b291jsnb200f0e4991f",
+                "53b24b08c8mshf61178d79471fa7p1400f4jsn6fecd54140a5",
+                "ab0e40b482msh18871d35122464fp1edaedjsn206af4cfd05e",
+                "94d426ad4amsh14c8f8432fa7671p146158jsne07000bd0510",
+                "ec55ad43f4msha9cfcd80ea94580p149b9fjsn892bcfeef149"
+            ]
+        };
+
+        function getRandomKey(service) {
+            const keys = apiKeys[service];
+            return keys[Math.floor(Math.random() * keys.length)];
+        }
+
+        const container = document.getElementById("defaultTracks");
+        const artistIds = [
+            "7dGJo4pcD2V6oG8kP0tJRR", // Eminem
+            "06HL4z0CvFAxyc27GXpf02", // Taylor Swift
+            "1Xyo4u8uXC1ZmMpatF05PJ"  // The Weeknd
+        ];
+
+        const headers = {
+            "x-rapidapi-key": getRandomKey("MusicApis"),
+            "x-rapidapi-host": "spotify-downloader9.p.rapidapi.com"
+        };
+
+        const fetchTopTracks = async (id) => {
+            const url = `https://spotify-downloader9.p.rapidapi.com/artistTopTracks?id=${id}&country=US`;
+            const response = await fetch(url, { headers });
+            const data = await response.json();
+            return data.data.tracks;
+        };
+
+        const renderTrack = (track) => {
+            return `
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 shadow">
+                        <img src="${track.album.images[0]?.url}" class="card-img-top" alt="${track.name}" />
+                        <div class="card-body">
+                            <h5 class="card-title">${track.name}</h5>
+                            <p class="card-text"><strong>Álbum:</strong> ${track.album.name}</p>
+                            <p class="card-text"><strong>Artista:</strong> ${track.artists[0]?.name}</p>
+                            <p class="card-text"><strong>ID del track:</strong> ${track.id}</p>
+                            <a href="${track.external_urls.spotify}" class="btn btn-success" target="_blank">Ver en Spotify</a>
+                            <button class="btn btn-warning mt-2 btn-magic" onclick="toggleAudioPlayer('${track.id}', this)">Descargar y Escuchar</button>
+                            
+                            <!-- Contenedor para los controles de audio (inicialmente oculto) -->
+                            <div id="audio-controls-${track.id}" class="mt-3 audio-container" style="display: none;">
+                                <audio id="audio-player-${track.id}" controls class="custom-audio w-100 mb-2"></audio>
+                                <a id="download-link-${track.id}" href="#" download class="btn btn-download w-100">
+                                    <i class="fas fa-download"></i> Descargar Canción
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        window.currentTrackList = [];
+
+        const loadAllTracks = async () => {
+            for (const id of artistIds) {
+                const tracks = await fetchTopTracks(id);
+                tracks.slice(0, 3).forEach(track => {
+                    window.currentTrackList.push(track);
+                    container.innerHTML += renderTrack(track);
+                });
+            }
+        };
+        @if (Model == null || !Model.Any())
+        {
+            <text>loadAllTracks();</text>
+        }
+
+        async function getUrlDescarga(TrackNombre){
+        const youtubeOptions = {
+                method: 'GET',
+                headers: {
+                    'x-rapidapi-key': getRandomKey("MusicApis"),
+                    'x-rapidapi-host': 'youtube138.p.rapidapi.com'
+                }
+        };
+
+        const youtubeMp3Options = {
+            method: 'GET',
+            headers: {
+                'x-rapidapi-key': getRandomKey("MusicApis"),
+                'x-rapidapi-host': 'youtube-mp36.p.rapidapi.com'
+            }
+        };
+
+        const YoutubeVideoId = `https://youtube138.p.rapidapi.com/search/?q=${encodeURIComponent(TrackNombre)}&hl=en&gl=ES`;
+        const youtubeResponse = await fetch(YoutubeVideoId, youtubeOptions);
+        const youtubeResult = await youtubeResponse.json();
+        const videoId = youtubeResult.contents?.[0]?.video?.videoId;
+        const YoutubeMp3Url = `https://youtube-mp36.p.rapidapi.com/dl?id=${videoId}`;
+        const youtubeResponseMp3 = await fetch(YoutubeMp3Url, youtubeMp3Options);
+        const youtubeResultMp3 = await youtubeResponseMp3.json();
+        const mp3UrlMp3Descarga = youtubeResultMp3.link;
+
+        const resultado = {
+            UrlDescarga: mp3UrlMp3Descarga,
+            Title: TrackNombre
+        }
+
+        return resultado;
+    }
+
+    async function getUrlMuica(trackId) {
+        const encodedTrackUrl = encodeURIComponent(`https://open.spotify.com/track/${trackId}`);
+        const downloaderApiUrl = `https://spotify-downloader9.p.rapidapi.com/downloadSong?songId=${encodedTrackUrl}`;
+
+        const downloaderOptions = {
+                method: 'GET',
+                headers: {
+                    'x-rapidapi-key': getRandomKey("MusicApis"),
+                    'x-rapidapi-host': 'spotify-downloader9.p.rapidapi.com'
+                }
+        };
+        const resultado = {
+            UrlMusica: "",
+            Title: "",
+            UrlDescarga: "",
+        }
+        try {
+            // Obtener el MP3
+            const DownloadResponse = await fetch(downloaderApiUrl, downloaderOptions);
+            const DownloadResult = await DownloadResponse.json();
+
+            if (!DownloadResult.success || !DownloadResult.data?.downloadLink) {
+                throw new Error("No se pudo obtener el MP3 desde la nueva API.");
+            }
+
+            const mp3Url = DownloadResult.data.downloadLink;
+
+            resultado.UrlMusica = mp3Url;
+            resultado.Title = DownloadResult.data.title;
+            const mp3UrlDescarga = await getUrlDescarga(resultado.Title);
+            resultado.UrlDescarga = mp3UrlDescarga.UrlDescarga;
+
+            console.log("MP3 URL:", resultado.UrlMusica);
+            console.log("MP3 Download URL:", resultado.UrlDescarga);
+            console.log("MP3 Title:", resultado.Title);
+            console.log("MP3 Download URL:", mp3UrlDescarga.UrlDescarga);
+            return resultado;
+        } catch (error) {
+            console.error("Error al obtener el MP3:", error); 
+            throw error;
+        }
+    }
+
+    // Función para mostrar/ocultar el reproductor en la misma card
+    async function toggleAudioPlayer(trackId, buttonElement) {
+        console.log("Track ID:", trackId);
+        const audioControls = document.getElementById(`audio-controls-${trackId}`);
+        const audioPlayer = document.getElementById(`audio-player-${trackId}`);
+        const downloadLink = document.getElementById(`download-link-${trackId}`);
+        
+        // Si ya está visible, solo lo ocultamos
+        if (audioControls.style.display === 'block') {
+            audioControls.style.display = 'none';
+            audioPlayer.pause();
+            buttonElement.textContent = 'Descargar y Escuchar';
+            return;
+        }
+        
+        // Mostrar mensaje de carga
+        buttonElement.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Cargando...';
+        
+        try {
+            // Obtener los datos de la canción
+            const trackData = await getUrlMuica(trackId);
+
+            console.log("Track Data:", trackData);
+
+            // Configurar el reproductor de audio
+            audioPlayer.src = trackData.UrlMusica;
+            downloadLink.href = trackData.UrlDescarga;
+            downloadLink.download = `${trackData.Title}.mp3`;
+            
+            // Mostrar controles
+            audioControls.style.display = 'block';
+            buttonElement.textContent = 'Ocultar Reproductor';
+            
+            // Reproducir automáticamente (opcional)
+            audioPlayer.play().catch(e => console.log("Autoplay prevented:", e));
+        } catch (error) {
+            console.error("Error al cargar la canción:", error);
+            buttonElement.textContent = 'Error - Intentar de nuevo';
+            
+            // Mostrar mensaje de error en la card
+            const errorElement = document.createElement('div');
+            errorElement.className = 'alert alert-danger mt-2';
+            errorElement.textContent = 'Error al cargar la canción. Intenta de nuevo.';
+            audioControls.innerHTML = '';
+            audioControls.appendChild(errorElement);
+            audioControls.style.display = 'block';
+        }
+    }
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const logoutLink = document.getElementById('logout-link');
+
+        if (logoutLink) {
+            logoutLink.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You will be signed out from the application.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, sign me out',
+                    background: '#1a1a1a',
+                    color: '#f1f1f1',
+                    customClass: {
+                        popup: 'rounded-4 shadow-lg',
+                        confirmButton: 'btn btn-danger',
+                        cancelButton: 'btn btn-secondary me-3'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/Account/Logout';
+                    }
+                });
+            });
+        }
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

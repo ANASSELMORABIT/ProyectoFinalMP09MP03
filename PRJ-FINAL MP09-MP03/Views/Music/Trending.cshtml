@@ -1,0 +1,374 @@
+@model PRJ_FINAL_MP09_MP03.Models.MusicViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Trending";
+    var selectedPeriod = Context.Request.Query["timePeriod"].FirstOrDefault() ?? "week";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tendencias Musicales</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <!-- Estilo personalizado -->
+    <link href="~/css/dashboard.css" rel="stylesheet" />
+    <style>
+        /* --- SOLO los estilos de las trending-card, el resto ya está en dashboard.css --- */
+        .trending-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0px 15px 35px -5px rgba(50, 88, 130, 0.32);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .trending-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 20px 40px -5px rgba(50, 88, 130, 0.4);
+        }
+        .trending-card__image {
+            width: 100%;
+            height: 200px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0px 10px 40px 0px rgba(76, 70, 124, 0.5);
+            margin-bottom: 15px;
+        }
+        .trending-card__image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .trending-card:hover .trending-card__image img {
+            transform: scale(1.05);
+        }
+        .trending-card__title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+        .trending-card__artist {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1rem;
+        }
+        .trending-card__button {
+            background: #532ab9;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0px 5px 15px rgba(83, 42, 185, 0.3);
+            text-decoration: none;
+            display: inline-block;
+        }
+        .trending-card__button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0px 8px 20px rgba(83, 42, 185, 0.4);
+            color: white;
+        }
+        .section-title {
+            color: #fff;
+            font-size: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, #532ab9, #8a2be2);
+            border-radius: 3px;
+        }
+        @@media (max-width: 768px) {
+            .trending-card__image { height: 150px; }
+            .trending-card__title { font-size: 1.1rem; }
+            .trending-card__artist { font-size: 0.9rem; }
+            .section-title { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fondo y gradientes -->
+    <div class="gradient-bg">
+        <svg xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <filter id="goo">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+                    <feBlend in="SourceGraphic" in2="goo" />
+                </filter>
+            </defs>
+        </svg>
+        <div class="gradients-container">
+            <div class="g1"></div>
+            <div class="g2"></div>
+            <div class="g3"></div>
+            <div class="g4"></div>
+            <div class="g5"></div>
+            <div class="interactive"></div>
+        </div>
+    </div>
+    <div class="app-window">
+        <aside>
+            <nav class="nav nav--main">
+                <ul>
+                    <li>
+                        <a asp-controller="Music" asp-action="Dashboard">
+                            <i class="fas fa-headphones"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item--selected">
+                        <a asp-controller="Music" asp-action="Trending">
+                            <i class="fas fa-fire"></i> Trending
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Music" asp-action="TopTracksArtista">
+                            <i class="fas fa-star"></i> Top Tracks Artistas
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <nav class="nav nav--has-icons">
+                <h3>Library</h3>
+                <ul>
+                    <li>
+                        <a asp-controller="Music" asp-action="Playlist">
+                            <i class="fas fa-list"></i> Playlists
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Music" asp-action="Lyrics">
+                            <i class="fas fa-music"></i> Lyrics
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-logout mt-auto">
+              <a href="#" class="logout-link" aria-label="Cerrar sesión">
+                <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                <span class="visually-hidden">Cerrar sesión</span>
+              </a>
+            </div>
+        </aside>
+        <main>
+            <div class="top-bar">
+                <div class="top-bar__search">
+                    <i class="fas fa-search"></i>
+                    <form method="get" asp-controller="Music" asp-action="BuscarTrackId">
+                        <input type="text" name="nombreCancion" placeholder="Buscar canción..." required />
+                    </form>
+                </div>
+                <div class="top-bar__user">
+                    <a asp-controller="Account" asp-action="Profile">
+                        <i class="fas fa-user"></i>
+                    </a>
+                    <a href="#" class="logout-link text-danger" aria-label="Cerrar sesión">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="visually-hidden">Cerrar sesión</span>
+                    </a>
+                </div>
+            </div>
+            <h1 class="screen-title">Tendencias Musicales</h1>
+            <form method="get" asp-controller="Music" asp-action="Trending" class="text-center mb-5">
+                <label for="timePeriod" class="form-label">Filtrar por período:</label>
+                @Html.DropDownList(
+                    "timePeriod",
+                    new List<SelectListItem> {
+                        new SelectListItem { Text = "Día", Value = "day", Selected = selectedPeriod == "day" },
+                        new SelectListItem { Text = "Semana", Value = "week", Selected = selectedPeriod == "week" },
+                        new SelectListItem { Text = "Mes", Value = "month", Selected = selectedPeriod == "month" }
+                    },
+                    new { @class = "form-select d-inline-block w-auto mx-2", id = "timePeriod" }
+                )
+                <button type="submit" class="btn btn-primary">Actualizar</button>
+            </form>
+            <!-- Canciones en Tendencia -->
+            <h2 class="section-title">🔥 Canciones en Tendencia</h2>
+            @if (Model.Trending != null && Model.Trending.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
+                    @foreach (var item in Model.Trending)
+                    {
+                        var song = item.item;
+                        <div class="col">
+                            <div class="trending-card">
+                                <div class="trending-card__image">
+                                    <img src="@song.song_art_image_url" alt="Imagen de @song.title">
+                                </div>
+                                <div class="trending-card__content">
+                                    <h5 class="trending-card__title">@song.title</h5>
+                                    <p class="trending-card__artist">@song.artist_names</p>
+                                    <a asp-controller="Music" asp-action="SongDetails" asp-route-id="@song.id" class="trending-card__button">
+                                        <i class="fas fa-info-circle"></i> Ver Detalles
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center mt-4">
+                    No se encontraron canciones en tendencia.
+                </div>
+            }
+            <!-- Artistas en Tendencia -->
+            <h2 class="section-title">🎤 Artistas en Tendencia</h2>
+            @if (Model.TrendingArtists != null && Model.TrendingArtists.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
+                    @foreach (var item in Model.TrendingArtists)
+                    {
+                        var artist = item.item;
+
+                        if (!artist.name.Contains("Genius"))
+                        {
+                            <div class="col">
+                            <div class="trending-card">
+                                <div class="trending-card__image">
+                                    <img src="@artist.image_url" alt="Imagen de @artist.name">
+                                </div>
+                                <div class="trending-card__content">
+                                    <h5 class="trending-card__title">@artist.name</h5>
+                                    <p class="trending-card__artist">Popular artista en tendencia</p>
+                                    <a asp-controller="Music" asp-action="ArtistDetails" asp-route-id="@artist.id" target="_blank" class="trending-card__button">
+                                        <i class="fas fa-info-circle"></i> Ver Detalles
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                        
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center mt-4">
+                    No se encontraron artistas en tendencia.
+                </div>
+            }
+            <!-- Álbumes en Tendencia -->
+            <h2 class="section-title">📀 Álbumes en Tendencia</h2>
+            @if (Model.TrendingAlbums != null && Model.TrendingAlbums.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
+                    @foreach (var item in Model.TrendingAlbums)
+                    {
+                        var album = item.item;
+                        <div class="col">
+                            <div class="trending-card">
+                                <div class="trending-card__image">
+                                    <img src="@album.cover_art_url" alt="Imagen de @album.full_title">
+                                </div>
+                                <div class="trending-card__content">
+                                    <h5 class="trending-card__title">@album.full_title</h5>
+                                    <p class="trending-card__artist">@album.primary_artist_names</p>
+                                    <form asp-action="AlbumDetails" asp-controller="Music" method="get">
+                                        <input type="hidden" name="id" value="@album.id" />
+                                        <button type="submit" class="trending-card__button">
+                                            <i class="fas fa-info-circle"></i> Ver Detalles
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center mt-4">
+                    No se encontraron álbumes en tendencia.
+                </div>
+            }
+        </main>
+        <!-- Player (opcional, si quieres el mismo player que dashboard) -->
+        <div class="player" style="display: none;">
+            <i class="fas fa-expand player__dock player__max"></i>
+            <i class="fas fa-compress player__dock player__min"></i>
+            <div class="player__left">
+                <img src="" alt="Album Cover" class="player__pic" id="playerAlbumCover" />
+                <div class="now-playing">
+                    <span class="now-playing--title" id="playerTitle"></span>
+                    <span class="now-playing--artist" id="playerArtist"></span>
+                </div>
+            </div>
+            <div class="player__centre">
+                <div class="player-actions">
+                    <i class="fas fa-step-backward" id="prevTrack"></i>
+                    <i class="fas fa-play" id="playPauseBtn"></i>
+                    <i class="fas fa-step-forward" id="nextTrack"></i>
+                </div>
+                <div class="player-progress">
+                    <span id="currentTime">0:00</span>
+                    <div class="player-progress-bar">
+                        <div class="player-progress-bar-done" id="progressBar"></div>
+                    </div>
+                    <span id="duration">0:00</span>
+                </div>
+            </div>
+            <div class="player__right">
+                <i class="fas fa-volume-up" id="volumeIcon"></i>
+                <div class="player-progress-bar">
+                    <div class="player-progress-bar-done" id="volumeBar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.logout-link').forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        Swal.fire({
+          title: '¿Seguro que quieres cerrar sesión?',
+          text: "Se cerrará tu sesión en la aplicación.",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Sí, cerrar sesión',
+          background: '#1a1a1a',
+          color: '#f1f1f1',
+          customClass: {
+            popup: 'rounded-4 shadow-lg',
+            confirmButton: 'btn btn-danger',
+            cancelButton: 'btn btn-secondary me-3'
+          }
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = '/Account/Logout';
+          }
+        });
+      });
+    });
+  });
+</script>
+</body>
+</html>

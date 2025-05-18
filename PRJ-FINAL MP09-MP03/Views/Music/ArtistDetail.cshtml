@@ -1,0 +1,201 @@
+@model PRJ_FINAL_MP09_MP03.Models.ArtistDetaille.Artist
+
+@{
+    ViewData["Title"] = "Artist Details";
+    
+}
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@Model.name</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <!-- Estilo personalizado -->
+    <link href="~/css/dashboard.css" rel="stylesheet" />
+
+    <style>
+        body { min-height: 100vh; }
+        .app-window { display: flex; min-height: 100vh; }
+        aside {
+            min-width: 220px;
+            background: rgba(34, 40, 60, 0.7);
+            backdrop-filter: blur(16px);
+            border-right: 1.5px solid rgba(255,255,255,0.13);
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 2rem 1rem 1rem 1rem;
+        }
+        .nav--main ul, .nav--has-icons ul { list-style: none; padding: 0; }
+        .nav--main ul li, .nav--has-icons ul li { margin-bottom: 1.2rem; }
+        .nav--main a, .nav--has-icons a {
+            color: #fff; text-decoration: none; font-weight: 600; font-size: 1.1rem;
+            display: flex; align-items: center; gap: 0.7rem; border-radius: 12px; padding: 0.5rem 1rem;
+            transition: background 0.2s;
+        }
+        .nav--main a:hover, .nav--has-icons a:hover, .nav-item--selected a {
+            background: linear-gradient(90deg, #532ab9 60%, #8a2be2 100%);
+            color: #fff;
+        }
+        .nav--has-icons h3 { color: #8a2be2; font-size: 1rem; margin-bottom: 0.7rem; }
+        main { flex: 1; padding: 2.5rem 2rem; }
+        .glass-detail-container {
+            background: rgba(34, 40, 60, 0.55);
+            backdrop-filter: blur(16px) saturate(1.2);
+            border-radius: 28px;
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+            color: #fff;
+            padding: 2.5rem 2rem;
+            margin: 2rem auto;
+            max-width: 900px;
+        }
+        .glass-detail-container h1 {
+            color: #222;
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            margin-bottom: 1.2rem;
+        }
+        .glass-detail-container img {
+            border-radius: 22px;
+            box-shadow: 0 4px 24px 0 rgba(83,42,185,0.18);
+            margin-bottom: 1.5rem;
+            max-width: 100%;
+        }
+        .artist-info p {
+            background: rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 0.6rem 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #8a2be2;
+            font-weight: 600;
+            font-size: 1.08rem;
+            letter-spacing: 0.2px;
+        }
+        .description-box {
+            background: rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 1.2rem;
+            margin-top: 1.5rem;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.13);
+            font-size: 1.08rem;
+            font-weight: 400;
+        }
+        .btn-glow {
+            background: linear-gradient(90deg, #532ab9, #8a2be2);
+            color: #fff;
+            border-radius: 25px;
+            padding: 0.7rem 1.5rem;
+            font-weight: 700;
+            border: none;
+            box-shadow: 0 0 12px #8a2be2;
+            transition: all 0.2s;
+            font-size: 1.1rem;
+            margin-top: 1.5rem;
+        }
+        .btn-glow:hover {
+            background: #8a2be2;
+            color: #fff;
+            box-shadow: 0 0 18px #532ab9;
+        }
+        .glass-detail-container h5 {
+            color: #532ab9;
+            font-weight: 700;
+            margin-top: 1.2rem;
+        }
+        @@media (max-width: 900px) {
+            .glass-detail-container { padding: 1.2rem 0.5rem; }
+            main { padding: 1.2rem 0.5rem; }
+            aside { min-width: 60px; padding: 1rem 0.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fondo y gradientes -->
+    <div class="gradient-bg">
+        <svg xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <filter id="goo">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+                    <feBlend in="SourceGraphic" in2="goo" />
+                </filter>
+            </defs>
+        </svg>
+        <div class="gradients-container">
+            <div class="g1"></div>
+            <div class="g2"></div>
+            <div class="g3"></div>
+            <div class="g4"></div>
+            <div class="g5"></div>
+            <div class="interactive"></div>
+        </div>
+    </div>
+    <div class="app-window">
+        <!-- Sidebar -->
+        <aside>
+            <nav class="nav nav--main">
+                <ul>
+                    <li>
+                        <a asp-controller="Music" asp-action="Dashboard"><i class="fas fa-headphones"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Music" asp-action="Trending"><i class="fas fa-fire"></i> Trending</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Music" asp-action="TopTracksArtista"><i class="fas fa-star"></i> Top Tracks Artistas</a>
+                    </li>
+                </ul>
+            </nav>
+            <nav class="nav nav--has-icons">
+                <h3>Library</h3>
+                <ul>
+                    <li>
+                        <a asp-controller="Music" asp-action="Playlist"><i class="fas fa-list"></i> Playlists</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Music" asp-action="Lyrics"><i class="fas fa-music"></i> Lyrics</a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        <main>
+            <div class="glass-detail-container text-center">
+                <h1>@Model.name</h1>
+                <img src="@Model.header_image_url" alt="@Model.name" />
+                <div class="artist-info">
+                    <p><strong>Followers:</strong> @Model.followers_count</p>
+                    <p><strong>IQ:</strong> @Model.iq</p>
+                    <p><strong>Verified:</strong> @(Model.is_verified ? "Yes" : "No")</p>
+                    <p><strong>Facebook:</strong> @Model.facebook_name</p>
+                    <p><strong>Twitter:</strong> @Model.twitter_name</p>
+                    <p><strong>Instagram:</strong> @Model.instagram_name</p>
+                </div>
+                <div class="description-box">
+                    <h5>Description</h5>
+                    @Html.Raw(Model.description?.html ?? "<p>No description available.</p>")
+                </div>
+                <div class="text-center mt-4">
+                    <a href="@Model.url" target="_blank" class="btn-glow">View on Genius</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/artist-detail-effects.js"></script>
+
+</body>
+</html>
